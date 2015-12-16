@@ -8,7 +8,7 @@ Vagrant Debian LAMP Stack
  - Mysql 5.5
 
 L'IP de la machine Vagrant est 192.168.33.10.
-L'utilisateur est vagrant avec le mot de passe vagrant.
+L'utilisateur est `vagrant` avec le mot de passe `vagrant`.
 
 Pré-requis
 ----------
@@ -26,9 +26,9 @@ Le dossier www est monté à l'emplacement `/var/www`.
 Le fichier `/etc/php5/apache2/php.ini` est modifié lors du provisionnement de la machine par le module `puppet/modules/php`.
 
 Vous devez ajouter vos vhosts à votre fichier hosts sur votre machine hôte :
-192.168.33.10 phpmyadmin.local.dev
-192.168.33.10 project.local.dev
-...
+ - 192.168.33.10 phpmyadmin.local.dev
+ - 192.168.33.10 project.local.dev
+ - ...
 
 Vous pouvez gérer le service apache avec la commande suivante :
 `sudo service apache start|stop|restart|reload|...`
