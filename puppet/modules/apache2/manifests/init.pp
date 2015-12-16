@@ -18,8 +18,11 @@ class apache2::install {
     ensure => running,
   }
 
-  file { '/etc/apache2/sites-enabled/000-default.conf':
-    ensure  => absent,
+
+  # Disable default site
+  exec { "a2dissite 000-default" :
+    require => Package["apache2"],
+    notify  => Service["apache2"],
   }
 
   file { '/var/www/html':
@@ -43,4 +46,49 @@ class apache2::install {
     ensure => link,
     target => '/etc/apache2/mods-available/rewrite.load',
   }
+
+
+  # Source https://raw.github.com/Intracto/Puppet/master/apache2/manifests/init.pp
+
+  # Change user
+  exec { "ApacheUserChange" :
+    command => "sed -i 's/APACHE_RUN_USER=www-data/APACHE_RUN_USER=vagrant/' /etc/apache2/envvars",
+    onlyif  => "grep -c 'APACHE_RUN_USER=www-data' /etc/apache2/envvars",
+    require => Package["apache2"],
+    notify  => Service["apache2"],
+  }
+
+  # Change group
+  exec { "ApacheGroupChange" :
+    command => "sed -i 's/APACHE_RUN_GROUP=www-data/APACHE_RUN_GROUP=vagrant/' /etc/apache2/envvars",
+    onlyif  => "grep -c 'APACHE_RUN_GROUP=www-data' /etc/apache2/envvars",
+    require => Package["apache2"],
+    notify  => Service["apache2"],
+  }
+
+  exec { "apache_lockfile_permissions" :
+    command => "chown -R vagrant:vagrant /var/lock/apache2",
+    require => Package["apache2"],
+    notify  => Service["apache2"],
+  }
+
+  #links from /vagrant shared folder
+  file {"/var/www":
+    ensure => "link",
+    target => "/vagrant/www",
+    require => Package["apache2"],
+    notify => Service["apache2"],
+    replace => yes,
+    force => true,
+  }
+
+  file {"/etc/apache2/sites-enabled":
+    ensure => "link",
+    target => "/vagrant/vhosts",
+    require => Package["apache2"],
+    notify => Service["apache2"],
+    replace => yes,
+    force => true,
+  }
+
 }
